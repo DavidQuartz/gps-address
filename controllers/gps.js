@@ -102,6 +102,8 @@ const getGhPostAddress = async function (address, options) {
 exports.getLatLng = (req, res) => {
   const { digitalAddress } = req.params;
 
+  console.log('address', process.env.GHANA_POST_ADDRESS)
+
   getGhPostAddress(digitalAddress, { timeout: 10000 })
     .then((data) => {
       res.status(200).json({
