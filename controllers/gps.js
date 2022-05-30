@@ -4,6 +4,7 @@ const getGhPostAddress = async function (address, options) {
   const browser = await puppeteer.launch({
     headless: true,
     defaultViewport: { width: 1024, height: 780, isMobile: false },
+    args: ['--no-sandbox']
   });
   const page = await browser.newPage();
 
@@ -101,8 +102,6 @@ const getGhPostAddress = async function (address, options) {
 
 exports.getLatLng = (req, res) => {
   const { digitalAddress } = req.params;
-
-  console.log('address', process.env.GHANA_POST_ADDRESS)
 
   getGhPostAddress(digitalAddress, { timeout: 10000 })
     .then((data) => {
