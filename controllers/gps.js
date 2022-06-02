@@ -82,6 +82,7 @@ const getGhPostAddress = async function (address, options) {
       (el) => el.innerText
     );
 
+ 
     const data = {
       streetName,
       region,
@@ -95,8 +96,20 @@ const getGhPostAddress = async function (address, options) {
 
     return data;
   } catch (e) {
+    await page.waitForFunction(
+      'document.querySelector(\'.p-3.text-danger.text-center\')',
+      {timeout: options.timeout || 1000}
+    )
+       const noLocationFound = await page.$eval(
+      '.close.float-right + h5', 
+      (el) => el.innerText
+    )
+
     await browser.close();
-    return [e];
+    return {
+      ...e,
+      error: noLocationFound ? noLocationFound : "There was a problem retrieving the digital address, try again later."
+    };
   }
 };
 
