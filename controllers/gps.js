@@ -96,37 +96,43 @@ const getGhPostAddress = async function (address, options) {
 
     return data;
   } catch (e) {
-    await page.waitForFunction(
-      'document.querySelector(\'.p-3.text-danger.text-center\')',
-      {timeout: options.timeout || 1000}
-    )
-       const noLocationFound = await page.$eval(
-      '.close.float-right + h5', 
-      (el) => el.innerText
-    )
+
+    const noLocationFound = await page.evaluate(
+      () => {
+        const element = document.querySelector('.close.float-right + h5');
+        return element ?element.innerText : ''
+      })
 
     await browser.close();
     return {
       ...e,
-      error: noLocationFound ? noLocationFound : "There was a problem retrieving the digital address, try again later."
+      error: (noLocationFound && typeof(noLocationFound) === 'string') ? noLocationFound : "There was a problem retrieving the digital address, try again later."
     };
   }
 };
 
 exports.getLatLng = (req, res) => {
   const { digitalAddress } = req.params;
-
-  getGhPostAddress(digitalAddress, { timeout: 10000 })
-    .then((data) => {
-      res.status(200).json({
-        status: 'success',
-        data,
-      });
-    })
-    .catch((error) =>
-      res.status(500).json({
-        status: 'failed',
-        error,
+  try {
+  
+    getGhPostAddress(digitalAddress, { timeout: 10000 })
+      .then((data) => {
+        res.status(200).json({
+          status: 'success',
+          data,
+        });
       })
-    );
+      .catch((error) =>
+        res.status(500).json({
+          status: 'failed',
+          error,
+        })
+      );
+  } catch (error) {
+    console.log('error', error)
+    res.status(503).json({
+      status: 'failed',
+      error: "Something went really wrong. Kindly report to admin.",
+    });
+}
 };
