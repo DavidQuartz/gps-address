@@ -100,7 +100,7 @@ const getGhPostAddress = async function (address, options) {
     const noLocationFound = await page.evaluate(
       () => {
         const element = document.querySelector('.close.float-right + h5');
-        return element ?element.innerText : ''
+        return element ? element.innerText : ''
       })
 
     await browser.close();
